@@ -2,13 +2,14 @@
 {
   services.xserver = {
     enable = true;
-    layout = "us";
-    libinput.enable = true;
-    desktopManager.plasma6.enable = true;
-    displayManager.sddm.enable = true;
+    xkb.layout = "us";
   };
 
-  hardware.pulseaudio.enable = false;
+  services.libinput.enable = true;
+  services.desktopManager.plasma6.enable = true;
+  services.displayManager.sddm.enable = true;
+
+  services.pulseaudio.enable = false;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -23,7 +24,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    kate
+    kdePackages.kate
     kdePackages.konsole
   ];
 }
