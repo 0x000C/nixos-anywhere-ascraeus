@@ -35,7 +35,7 @@
               passwordFile = "/tmp/luks-passphrase";
               content = {
                 type = "lvm_pv";
-                volumeGroup = "vg0";
+                vg = "vg0";
               };
             };
           };
@@ -45,7 +45,6 @@
 
     lvm_vg.vg0 = {
       type = "lvm_vg";
-      physicalVolumes = [ "/dev/mapper/cryptroot" ];
       lvs = {
         root = {
           size = "100%FREE";
