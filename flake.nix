@@ -2,7 +2,7 @@
   description = "NixOS-anywhere deployment for the Ascraeus desktop";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     disko.url = "github:nix-community/disko";
     nixos-anywhere.url = "github:nix-community/nixos-anywhere";
   };

@@ -10,12 +10,12 @@
           partitions.EFI = {
             size = "1G";
             type = "EF00";
+            label = "BOOT";
             content = {
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
               mountOptions = [ "defaults" "noatime" ];
-              label = "BOOT";
             };
           };
         };
@@ -28,6 +28,7 @@
           partitions.cryptroot = {
             size = "100%";
             type = "8300";
+            label = "cryptroot";
             content = {
               type = "luks";
               name = "cryptroot";
@@ -35,7 +36,7 @@
               passwordFile = "/tmp/luks-passphrase";
               content = {
                 type = "lvm_pv";
-                volumeGroup = "vg0";
+                vg = "vg0";
               };
             };
           };
@@ -45,7 +46,6 @@
 
     lvm_vg.vg0 = {
       type = "lvm_vg";
-      physicalVolumes = [ "/dev/mapper/cryptroot" ];
       lvs = {
         root = {
           size = "100%FREE";
@@ -53,7 +53,6 @@
             type = "filesystem";
             format = "ext4";
             mountpoint = "/";
-            label = "nixos-root";
             mountOptions = [ "noatime" "discard" ];
           };
         };
@@ -62,27 +61,9 @@
           content = {
             type = "swap";
             resumeDevice = true;
-            label = "SWAP";
           };
         };
       };
     };
   };
-
-  fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-label/nixos-root";
-      fsType = "ext4";
-      options = [ "noatime" "discard" ];
-    };
-    "/boot" = {
-      device = "/dev/disk/by-label/BOOT";
-      fsType = "vfat";
-      options = [ "noatime" ];
-    };
-  };
-
-  swapDevices = [
-    { device = "/dev/disk/by-label/SWAP"; }
-  ];
 }
