@@ -1,0 +1,5 @@
+deployment/secrets.env
+deployment/generated/
+deployment/runtime/
+result
+.DS_Store
