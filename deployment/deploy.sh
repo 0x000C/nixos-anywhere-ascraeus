@@ -103,14 +103,12 @@ chmod 600 "${USER_FILE}"
 echo "${encryption_passphrase}" > "${LUKS_FILE}"
 chmod 600 "${LUKS_FILE}"
 
-scp -P "${ssh_port}" "${LUKS_FILE}" "${target_host}:/tmp/luks-passphrase"
-ssh -p "${ssh_port}" "${target_host}" 'chmod 600 /tmp/luks-passphrase'
-
 install_cmd=(
   nix run github:nix-community/nixos-anywhere
   --
   --flake "${REPO_ROOT}#ascraeus"
   --ssh-port "${ssh_port}"
+  --disk-encryption-keys /tmp/luks-passphrase "${LUKS_FILE}"
   "${target_host}"
 )
 
