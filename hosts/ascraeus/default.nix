@@ -9,7 +9,6 @@
     ./users.nix
     ./services.nix
     ./performance.nix
-    ./secrets.nix
   ];
 
   system.stateVersion = lib.mkDefault "25.05";

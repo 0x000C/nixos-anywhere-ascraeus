@@ -15,11 +15,9 @@
     disko.url = "github:nix-community/disko";
     nixos-anywhere.url = "github:nix-community/nixos-anywhere";
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
-    sops-nix.url = "github:Mic92/sops-nix";
-    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nixpkgs, disko, nixos-anywhere, nixos-facter-modules, sops-nix, ... }:
+  outputs = inputs@{ self, nixpkgs, disko, nixos-anywhere, nixos-facter-modules, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -31,7 +29,6 @@
           nixos-facter-modules.nixosModules.facter
           { config.facter.reportPath = ./hosts/ascraeus/facter.json; }
           disko.nixosModules.disko
-          sops-nix.nixosModules.sops
           { nixpkgs.hostPlatform = system; }
         ];
       };
@@ -42,9 +39,6 @@
         packages = [
           pkgs.git
           pkgs.cachix
-          pkgs.sops
-          pkgs.age
-          pkgs.python3
           nixos-anywhere.packages.${system}.default
           disko.packages.${system}.disko
         ];
