@@ -115,6 +115,4 @@ install_cmd=(
 echo "Starting deployment with nixos-anywhere..."
 "${install_cmd[@]}"
 
-ssh -p "${ssh_port}" "${target_host}" 'rm -f /tmp/luks-passphrase' || true
-
 echo "Deployment completed."
