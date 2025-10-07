@@ -22,9 +22,10 @@ group. Two logical volumes are created: `root` (ext4, mounted at `/`) and `swap`
 ```
 .
 ├── deployment            # Deployment tooling and defaults
-│   ├── deploy.sh         # Interactive deployment helper
-│   ├── defaults          # Default data used by the configuration
-│   └── secrets.env.example
+│   ├── deploy.sh         # Deployment helper that unwraps SOPS secrets
+│   └── defaults          # Sample data for local testing
+├── secrets               # Encrypted configuration data managed by sops-nix
+│   └── ascraeus.secrets.example.json
 ├── hosts                 # Host specific configuration split into small modules
 │   ├── ascraeus          # Ascraeus desktop configuration
 │   └── common            # Reusable building blocks
@@ -59,13 +60,24 @@ nix develop
 
 ## Preparing secrets
 
-Copy the example secrets file and edit the defaults to suit your environment.
-This file is never committed to git.
+Secrets are managed with [sops-nix](https://github.com/Mic92/sops-nix). Create
+an [age](https://age-encryption.org) key pair if you do not already have one:
 
 ```bash
-cp deployment/secrets.env.example deployment/secrets.env
-$EDITOR deployment/secrets.env
+age-keygen -o ~/.config/sops/age/keys.txt
 ```
+
+Use `sops` to create `secrets/ascraeus.secrets.json` based on the example
+structure:
+
+```bash
+cp secrets/ascraeus.secrets.example.json secrets/ascraeus.secrets.json
+sops secrets/ascraeus.secrets.json
+```
+
+Provide hashed passwords for both the primary user and `root` (for example with
+`mkpasswd -m sha-512`). The file also stores the LUKS passphrase used by the
+installer. Because the file is encrypted it can safely be committed to git.
 
 ## Running a deployment
 
@@ -78,11 +90,11 @@ $EDITOR deployment/secrets.env
    ./deployment/deploy.sh
    ```
 
-4. Answer the prompts for the target host, user credentials, and encryption
-   passphrase. Defaults are loaded from `deployment/secrets.env` when present.
-5. The script will generate the required user data, securely stage the LUKS
-   passphrase on the live system, and then run `nixos-anywhere` with the
-   `ascraeus` configuration.
+4. Ensure your age private key is available at
+   `~/.config/sops/age/keys.txt` (or export `SOPS_AGE_KEY_FILE`).
+5. The script decrypts the required data with `sops`, stages the LUKS
+   passphrase, copies the age key for the installed system, and then runs
+   `nixos-anywhere` with the `ascraeus` configuration.
 
 Upon completion the system reboots into the freshly installed NixOS desktop.
 Change the default passwords immediately after first boot if you used the
@@ -94,4 +106,5 @@ Modify the relevant module under `hosts/ascraeus/` or extend the shared modules
 under `hosts/common/`. Keep changes small and targeted to preserve readability.
 
 After making changes you can redeploy using the same `deployment/deploy.sh`
-script. The generated secrets are refreshed on each run.
+script. Secrets remain in `secrets/ascraeus.secrets.json`, so remember to
+re-encrypt the file with any new credentials before redeploying.
