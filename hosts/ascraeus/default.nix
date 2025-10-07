@@ -11,5 +11,5 @@
     ./performance.nix
   ];
 
-  system.stateVersion = lib.mkDefault "23.11";
+  system.stateVersion = lib.mkDefault "25.05";
 }
