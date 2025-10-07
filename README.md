@@ -42,6 +42,15 @@ settings live under `hosts/common/`.
 * Network access to the target NixOS live ISO (`root@<ip>`)
 * `git` and `nixos-anywhere` available locally (included in the dev shell)
 
+## Faster builds with Cachix
+
+The flake and system configuration trust the public
+[`nix-community`](https://nix-community.cachix.org) Cachix binary cache. This
+allows both local builds and remote deployments to reuse pre-built derivations,
+significantly cutting down the time spent compiling packages. The development
+shell also ships with the `cachix` CLI should you need to inspect or warm the
+cache manually.
+
 To enter a development shell with the required tooling, run:
 
 ```bash
