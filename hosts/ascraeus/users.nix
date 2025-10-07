@@ -1,29 +1,61 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   defaultUserPath = ../../deployment/defaults/user.nix;
-  generatedUserPath = ../../deployment/generated/user.nix;
-  userData = if builtins.pathExists generatedUserPath then import generatedUserPath else import defaultUserPath;
-  username = userData.username;
-  fullName = userData.fullName or username;
-  hashedPassword = userData.hashedPassword;
-  rootHashedPassword = userData.rootHashedPassword or hashedPassword;
+  defaultUser = import defaultUserPath;
+  username = defaultUser.username;
+  fullName = defaultUser.fullName or username;
+  hashedPasswordDefault = defaultUser.hashedPassword;
+  rootHashedPasswordDefault = defaultUser.rootHashedPassword or hashedPasswordDefault;
   extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
   ensurePassword = value: if value == null then "!" else value;
-  userEntry = {
-    isNormalUser = true;
-    description = fullName;
-    inherit extraGroups;
-    hashedPassword = ensurePassword hashedPassword;
-    shell = config.users.defaultUserShell;
-  };
-in
-{
-  users.mutableUsers = false;
-  users.users = {
-    "${username}" = userEntry;
-    root = {
-      hashedPassword = ensurePassword rootHashedPassword;
+  secretsFile = ../../secrets/ascraeus.secrets.json;
+  hasSecrets = builtins.pathExists secretsFile;
+  userPasswordSecretName = "users/${username}/password";
+  rootPasswordSecretName = "users/root-password";
+in {
+  sops.secrets = lib.mkIf hasSecrets {
+    "${userPasswordSecretName}" = {
+      sopsFile = secretsFile;
+      format = "json";
+      key = "users.${username}.hashedPassword";
+      owner = "root";
+      mode = "0400";
     };
+    "${rootPasswordSecretName}" = {
+      sopsFile = secretsFile;
+      format = "json";
+      key = "users.root.hashedPassword";
+      owner = "root";
+      mode = "0400";
+    };
+  };
+
+  users.mutableUsers = false;
+
+  users.users = {
+    "${username}" = lib.mkMerge [
+      {
+        isNormalUser = true;
+        description = fullName;
+        inherit extraGroups;
+        hashedPassword = ensurePassword hashedPasswordDefault;
+        shell = config.users.defaultUserShell;
+      }
+      (lib.mkIf hasSecrets {
+        hashedPassword = lib.mkForce null;
+        hashedPasswordFile = config.sops.secrets."${userPasswordSecretName}".path;
+      })
+    ];
+
+    root = lib.mkMerge [
+      {
+        hashedPassword = ensurePassword rootHashedPasswordDefault;
+      }
+      (lib.mkIf hasSecrets {
+        hashedPassword = lib.mkForce null;
+        hashedPasswordFile = config.sops.secrets."${rootPasswordSecretName}".path;
+      })
+    ];
   };
 
   security.sudo = {
