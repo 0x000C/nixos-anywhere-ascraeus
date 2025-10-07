@@ -14,9 +14,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     disko.url = "github:nix-community/disko";
     nixos-anywhere.url = "github:nix-community/nixos-anywhere";
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   };
 
-  outputs = inputs@{ self, nixpkgs, disko, nixos-anywhere, ... }:
+  outputs = inputs@{ self, nixpkgs, disko, nixos-anywhere, nixos-facter-modules, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
