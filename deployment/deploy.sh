@@ -108,7 +108,7 @@ install_cmd=(
   --
   --flake "${REPO_ROOT}#ascraeus"
   --ssh-port "${ssh_port}"
-  #--build-on-remote
+  --build-on auto
   --disk-encryption-keys /tmp/luks-passphrase "${LUKS_FILE}"
   "${target_host}"
 )
