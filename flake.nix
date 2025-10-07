@@ -27,7 +27,7 @@
         modules = [
           ./hosts/ascraeus
           nixos-facter-modules.nixosModules.facter
-          { config.facter.reportPath = ./hosts/ascraeus/facter.json }
+          { config.facter.reportPath = ./hosts/ascraeus/facter.json; }
           disko.nixosModules.disko
           { nixpkgs.hostPlatform = system; }
         ];
