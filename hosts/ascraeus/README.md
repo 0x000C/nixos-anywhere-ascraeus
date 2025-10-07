@@ -8,6 +8,6 @@ kept small and purposeful:
 * `storage.nix` — disko layout for /dev/sdc (boot) and /dev/sda (LUKS/LVM root)
 * `networking.nix` — hostname, firewall, and SSH policy
 * `desktop.nix` — KDE Plasma 6 desktop stack
-* `users.nix` — immutable user definitions driven by sops-nix secrets
+* `users.nix` — immutable user definitions sourced from generated secrets
 * `services.nix` — supporting services and packages
 * `performance.nix` — tuned kernel and power-management defaults
